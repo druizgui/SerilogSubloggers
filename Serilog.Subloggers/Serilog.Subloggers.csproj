@@ -4,9 +4,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <PropertyGroup>
-    <Version>1.1.0</Version>
-    <FileVersion>1.1.0</FileVersion>
-    <AssemblyVersion>1.1.0</AssemblyVersion>
+    <PackageVersion>1.1.0</PackageVersion>
+    <AssemblyVersion>1.1.0.0</AssemblyVersion>
+    <FileVersion>1.1.0.0</FileVersion>
   </PropertyGroup>
   <PropertyGroup>
     <Title>Serilog Subloggers using Filters</Title>
@@ -14,9 +14,9 @@
     <Product>Serilog</Product>
     <Description>Library with Serilog filters and eventid enrichment</Description>
     <PackageReadmeFile>Readme.md</PackageReadmeFile>
-    <PackageTags>ILogging Serilog eventid</PackageTags>
+    <PackageTags>ILogging Serilog eventid Subloggers</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageReleaseNotes>This library provides Serilog filters for separate logs in diferent purposes.</PackageReleaseNotes>
+    <PackageReleaseNotes>This library provides Serilog Subloggers configuration for separate logs in different purposes like, Security, System, Business, Analytics or Time metrics.</PackageReleaseNotes>
     <PackageProjectUrl>https://github.com/druizgui/SerilogSubloggers</PackageProjectUrl>
     <RepositoryUrl>https://github.com/druizgui/SerilogSubloggers</RepositoryUrl>
     <RepositoryType>git</RepositoryType>

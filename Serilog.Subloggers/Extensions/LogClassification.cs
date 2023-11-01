@@ -4,14 +4,8 @@ namespace Microsoft.Extensions.Logging
 {
     public class LogClassificationBase
     {
-        public EventId Event
-        {
-            get; private set;
-        }
-        public ILogger Logger
-        {
-            get; private set;
-        }
+        public EventId Event { get; private set; }
+        public ILogger Logger { get; private set; }
 
         public LogClassificationBase(ILogger logger, EventId eventId)
         {
@@ -21,12 +15,14 @@ namespace Microsoft.Extensions.Logging
             Event = eventId;
             Logger = logger;
         }
-
     }
+
     public class LogClassification : LogClassificationBase
     {
-        public LogClassification(ILogger logger, EventId eventId) :base(logger, eventId)
+        public LogClassification(ILogger logger, EventId eventId) : base(logger, eventId)
         {
+            if (logger == null) throw new ArgumentNullException("logger can't be null in LogClassification Factory", nameof(logger));
+            if (string.IsNullOrWhiteSpace(eventId.Name)) throw new ArgumentException("eventId.Name must be a valid value in LogClassification ctor", nameof(eventId.Name));
         }
 
         public static LogClassification Factory(int id, string type, ILogger logger)
@@ -36,7 +32,7 @@ namespace Microsoft.Extensions.Logging
             return new LogClassification(logger, new EventId(id, type));
         }
 
-        public static LogClassification Factory(ILogger logger, EventId eventId)
+        internal static LogClassification Factory(ILogger logger, EventId eventId)
         {
             return new LogClassification(logger, eventId);
         }

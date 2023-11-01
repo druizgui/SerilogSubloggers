@@ -3,7 +3,7 @@ using System;
 namespace Microsoft.Extensions.Logging
 {
     public static class LogClassificationExtensions
-    { 
+    {
         /// <summary>Writes a log message in the <see cref="ILogger"/> instance with the specified level <see cref="LogLevel"/>.</summary>
         /// <param name="log">A <see cref="ILogger"/> instance.</param>
         /// <param name="level">The <see cref="LogLevel"/> level.</param>
@@ -133,7 +133,7 @@ namespace Microsoft.Extensions.Logging
         /// <param name="message">The message.</param>
         public static ILogger Information(this LogClassification log, string message)
         {
-             log.Logger.LogInformation(log.Event, message);
+            log.Logger.LogInformation(log.Event, message);
             return log.Logger;
         }
 

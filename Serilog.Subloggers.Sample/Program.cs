@@ -2,6 +2,7 @@ using Microsoft.Extensions.Logging;
 
 using Serilog;
 using Serilog.Extensions.Logging;
+using System.Diagnostics;
 
 namespace Serilog.Subloggers.Sample
 {
@@ -42,6 +43,9 @@ namespace Serilog.Subloggers.Sample
 
             Serilog.Log.Logger = loggerBuilder.CreateLogger();
 
+            var totalTime_watch = new Stopwatch();
+            totalTime_watch.Start();
+
             using (var serilog = new SerilogLoggerFactory(Serilog.Log.Logger))
             {
                 Microsoft.Extensions.Logging.ILogger msLogger = serilog.CreateLogger("global");
@@ -72,12 +76,16 @@ namespace Serilog.Subloggers.Sample
                             .Information("Logon");
 
                 }
+
+                //Version 1.1.0
+                //Other usage for time metrics:
+
+                totalTime_watch.Stop();
+                msLogger.Time("TimeMetric-1").Information(totalTime_watch.Elapsed);
+                msLogger.Time<Program>().Information(totalTime_watch.Elapsed);
+                msLogger.Time<Program>("Version-1.1.0").Information(totalTime_watch.Elapsed);
+
             }
-
-            //Other usage for time metrics is :
-            //var watch = new Stopwatch();
-            //msLogger.TimeMetrics("time metric name", watch)
-
         }
     }
 }

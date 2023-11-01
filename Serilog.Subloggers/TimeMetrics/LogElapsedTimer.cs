@@ -23,7 +23,12 @@ namespace Microsoft.Extensions.Logging
         public void Dispose()
         {
             watch.Stop();
-            Log.LogInformation(EventId, $"{Name}\tElapsed:\t{watch.Elapsed:hh\\:mm\\:ss\\.fff}");
+            Log.LogInformation(EventId, TimeMetricLogFormatter(Name, watch.Elapsed));
+        }
+
+        internal static string TimeMetricLogFormatter(string name, TimeSpan elapsed)
+        {
+            return $"{name}\tElapsed:\t{elapsed:hh\\:mm\\:ss\\.fff}";
         }
     }
 }

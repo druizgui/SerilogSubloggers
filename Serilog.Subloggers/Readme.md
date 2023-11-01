@@ -183,12 +183,10 @@ Full code example:
 ```cs
 static void Main(string[] args)
 {
-    Serilog.Log.Logger = new LoggerConfiguration()
+    var loggerBuilder = new LoggerConfiguration()
         .MinimumLevel.Debug()
         .WriteTo.Console() // default log in console for general purposes. All 
-
         .Enrich.With<EventTypeEnricher>() // used for read eventId log properties
-
         .WriteTo.Logger(
             lc => lc.Filter.With<SecurityEventFilter>()
             .WriteTo.File(@"log\Security.txt", rollingInterval: RollingInterval.Day)
@@ -214,35 +212,51 @@ static void Main(string[] args)
             lc => lc.Filter.With<TimeMetricsEventFilter>()
             .WriteTo.File(@"log\TimeMetrics.txt", rollingInterval: RollingInterval.Day)
         ) // Time metrics log to trace Elapsed time inside the software components
+        ;
 
-        .CreateLogger();
+    Serilog.Log.Logger = loggerBuilder.CreateLogger();
 
-    Microsoft.Extensions.Logging.ILogger msLogger = new SerilogLoggerFactory(Serilog.Log.Logger).CreateLogger("global");
-            
-    using (msLogger.TimeMetrics<Program>("Method"))  // Trace elapsed time in a timemetric log event
+    var totalTime_watch = new Stopwatch();
+    totalTime_watch.Start();
+
+    using (var serilog = new SerilogLoggerFactory(Serilog.Log.Logger))
     {
-        msLogger.LogInformation("Hello world!"); // Normal log with default extensions
-        msLogger.Info("Normal log");  // Info log using Extensions ('Info' instead of 'LogInformation')
+        Microsoft.Extensions.Logging.ILogger msLogger = serilog.CreateLogger("global");
 
-        msLogger.Security().Info("Security message");    // Trace security log event
-        msLogger.Business().Info("Business message");    // Trace business log event
-        msLogger.Analytics().Info("Analytics message");  // Trace analytics log event
-        msLogger.System().Info("System message");        // Trace system log event
+        using (msLogger.TimeMetrics<Program>(nameof(Main))) // Trace elapsed time in a time metric log event
+        {
+            msLogger.LogInformation("Hello world!"); // Normal log with default extensions
+            msLogger.Info("Normal log");  // Information log using Extensions ('Info' instead of 'LogInformation')
 
-        msLogger.Info("Wait 1 second");
-        Thread.Sleep(1000);
+            msLogger.Security().Info("Security message");    // Trace security log event
+            msLogger.Business().Info("Business message");    // Trace business log event
+            msLogger.Analytics().Info("Analytics message");  // Trace analytics log event
+            msLogger.System().Info("System message");        // Trace system log event
 
-        msLogger.Security().Verbose("Verbose");
-        msLogger.Security().Error(new Exception("security exception"), "Error");
-        msLogger.Security().Warning("Warning");
+            msLogger.LogInformation("Wait 1 second");
+            Thread.Sleep(1000);
 
-        msLogger
-            .Security()
-                .Information("Logon access granted")
-            .System()
-                .Debug("User login OK")
-            .Analytics()
-                .Information("Logon");
+            msLogger.Security().Verbose("Verbose");
+            msLogger.Security().Error(new Exception("security exception"), "Error");
+            msLogger.Security().Warning("Warning");
+
+            msLogger
+                .Security()
+                    .Info("Logon access granted")
+                .System()
+                    .Debug("User login OK")
+                .Analytics()
+                    .Information("Logon");
+
+        }
+
+        //Version 1.1.0
+        //Other usage for time metrics:
+
+        totalTime_watch.Stop();
+        msLogger.Time("TimeMetric-1").Information(totalTime_watch.Elapsed);
+        msLogger.Time<Program>().Information(totalTime_watch.Elapsed);
+        msLogger.Time<Program>("Version-1.1.0").Information(totalTime_watch.Elapsed);
 
     }
 
@@ -302,6 +316,9 @@ System.Exception: security exception
 **Log\TimeMetrics.txt**
 ```
 2023-09-04 20:12:25.291 +02:00 [INF] Serilog.Subloggers.Sample.Program.Main. Elapsed: 00:00:01.175
+2023-11-01 20:02:56.643 +01:00 [INF] TimeMetric-1	Elapsed:	00:00:08.871
+2023-11-01 20:02:56.646 +01:00 [INF] Serilog.Subloggers.Sample.Program	Elapsed:	00:00:08.871
+2023-11-01 20:02:56.648 +01:00 [INF] Serilog.Subloggers.Sample.Program.Version-1.1.0	Elapsed:	00:00:08.871
 ```
 
 You can see the full example in **Serilog.Subloggers.Sample** project.
@@ -316,7 +333,7 @@ You can see the full example in **Serilog.Subloggers.Sample** project.
 
 # Versions 
 
-## 1.0.0
+## Version 1.0.0
 
 EventTypeEnricher for Serilog
 
@@ -348,9 +365,19 @@ LoggerExtensions for **Microsoft.Extensions.Logging.ILogger**:
 - Analytics
 - Business
 
-## 1.1.0
+## Version 1.1.0
 
 - Tests coverage
 - LogClassificationExtensions Write methods
 - TimeMetrics Log use now \t separators for easy use in a table to check time metrics
-        
+
+**New Time Extensions:**
+Allow register time from external time measure:
+
+- log.Time(ILogger Log, string name).Info(TimeSpan.FromSeconds(1));
+- log.Time<T>(ILogger Log).Info(TimeSpan.FromSeconds(2));
+- log.Time<T>(ILogger Log, string name).Info(TimeSpan.FromSeconds(3));
+
+- log.Time(ILogger Log, string name).Info(TimeSpan.FromSeconds(1));
+- log.Time<T>(ILogger Log).Info(TimeSpan.FromSeconds(2));
+- log.Time<T>(ILogger Log, string name).Info(TimeSpan.FromSeconds(3));

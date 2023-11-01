@@ -20,13 +20,9 @@ namespace Serilog
                     var result = propsValues.Properties.OfType<LogEventProperty>().Any(p => p.Name == "Name" && p.Value.ToString().Trim('"') == FilterName);
                     return result;
                 }
+            }
 
-                return false;
-            }
-            else
-            {
-                return false;
-            }
+            return false;
         }
     }
 }

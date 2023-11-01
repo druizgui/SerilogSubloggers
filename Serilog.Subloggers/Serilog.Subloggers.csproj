@@ -4,6 +4,11 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <PropertyGroup>
+    <Version>1.1.0</Version>
+    <FileVersion>1.1.0</FileVersion>
+    <AssemblyVersion>1.1.0</AssemblyVersion>
+  </PropertyGroup>
+  <PropertyGroup>
     <Title>Serilog Subloggers using Filters</Title>
     <Authors>David Ruiz</Authors>
     <Product>Serilog</Product>

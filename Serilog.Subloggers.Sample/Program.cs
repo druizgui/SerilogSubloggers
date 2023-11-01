@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+
 using Serilog;
 using Serilog.Extensions.Logging;
 
@@ -8,11 +9,10 @@ namespace Serilog.Subloggers.Sample
     {
         static void Main(string[] args)
         {
-            Serilog.Log.Logger = new LoggerConfiguration()
+            var loggerBuilder = new LoggerConfiguration()
                 .MinimumLevel.Debug()
                 .WriteTo.Console() // default log in console for general purposes. All 
                 .Enrich.With<EventTypeEnricher>() // used for read eventId log properties
-
                 .WriteTo.Logger(
                     lc => lc.Filter.With<SecurityEventFilter>()
                     .WriteTo.File(@"log\Security.txt", rollingInterval: RollingInterval.Day)
@@ -38,8 +38,9 @@ namespace Serilog.Subloggers.Sample
                     lc => lc.Filter.With<TimeMetricsEventFilter>()
                     .WriteTo.File(@"log\TimeMetrics.txt", rollingInterval: RollingInterval.Day)
                 ) // Time metrics log to trace Elapsed time inside the software components
+                ;
 
-                .CreateLogger();
+            Serilog.Log.Logger = loggerBuilder.CreateLogger();
 
             using (var serilog = new SerilogLoggerFactory(Serilog.Log.Logger))
             {
@@ -72,6 +73,11 @@ namespace Serilog.Subloggers.Sample
 
                 }
             }
+
+            //Other usage for time metrics is :
+            //var watch = new Stopwatch();
+            //msLogger.TimeMetrics("time metric name", watch)
+
         }
     }
 }

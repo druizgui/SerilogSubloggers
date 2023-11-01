@@ -312,3 +312,45 @@ You can see the full example in **Serilog.Subloggers.Sample** project.
 
 ## Net Core Dependencies
 - Microsoft.Extensions.Logging.Abstractions
+
+
+# Versions 
+
+## 1.0.0
+
+EventTypeEnricher for Serilog
+
+LoggerExtensions for **Microsoft.Extensions.Logging.ILogger**:
+
+- Info
+- Information
+- Warning
+- Error
+- Fatal
+- Write(LogLevel)
+- Debug
+- Verbose
+
+**LogClassificationExtensions**:
+
+- Info
+- Information
+- Warning
+- Error
+- Fatal
+- Write(LogLevel)
+- Debug
+- Verbose
+
+**LoggerClassificationExtensions**: 
+- System
+- Security
+- Analytics
+- Business
+
+## 1.1.0
+
+- Tests coverage
+- LogClassificationExtensions Write methods
+- TimeMetrics Log use now \t separators for easy use in a table to check time metrics
+        

@@ -7,9 +7,9 @@ namespace Microsoft.Extensions.Logging
     {
         Stopwatch watch;
 
-        private ILogger Log;
-        private string Name;
-        private EventId EventId;
+        internal ILogger Log;
+        internal string Name;
+        internal EventId EventId;
 
         public LogElapsedTimer(ILogger log, string name, EventId? eventId = null)
         {
@@ -23,7 +23,7 @@ namespace Microsoft.Extensions.Logging
         public void Dispose()
         {
             watch.Stop();
-            Log.LogInformation(EventId, $"{Name}. Elapsed: {watch.Elapsed:hh\\:mm\\:ss\\.fff}");
+            Log.LogInformation(EventId, $"{Name}\tElapsed:\t{watch.Elapsed:hh\\:mm\\:ss\\.fff}");
         }
     }
 }

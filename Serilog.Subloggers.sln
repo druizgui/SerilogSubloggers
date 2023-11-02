@@ -7,9 +7,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serilog.Subloggers", "Seril
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serilog.Subloggers.Sample", "Serilog.Subloggers.Sample\Serilog.Subloggers.Sample.csproj", "{3E81CA9D-695A-4F45-8D15-F07B44235152}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Serilog.Subloggers.Tests", "Serilog.Subloggers.Tests\Serilog.Subloggers.Tests.csproj", "{DAB6850C-9046-4FE5-B158-B3A3D385C781}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serilog.Subloggers.Tests", "Serilog.Subloggers.Tests\Serilog.Subloggers.Tests.csproj", "{DAB6850C-9046-4FE5-B158-B3A3D385C781}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{DC5E1B6E-BE26-43DA-985A-A70D8AFC618F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "doc", "doc", "{337CC3DA-D45D-497A-937B-67A57F3DAA5B}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -131,16 +131,16 @@ This line capture eventId from log in order to configure a filter
     .WriteTo.File(@"log\Business.txt", rollingInterval: RollingInterval.Day)
 ) 
 
-// Time metrics log to trace Elapsed time inside the software components
-.WriteTo.Logger(
-    lc => lc.Filter.With<TimeMetricsEventFilter>()
-    .WriteTo.File(@"log\TimeMetrics.txt", rollingInterval: RollingInterval.Day)
-) 
-
 // Log errors in a separate file:
     .WriteTo.Logger(
     lc => lc.Filter.With<ErrorsEventFilter>()
     .WriteTo.File(@"log\Errors.txt", rollingInterval: RollingInterval.Day)
+) 
+
+// Time metrics log to trace Elapsed time inside the software components
+.WriteTo.Logger(
+    lc => lc.Filter.With<TimeMetricsEventFilter>()
+    .WriteTo.File(@"log\TimeMetrics.txt", rollingInterval: RollingInterval.Day)
 ) 
 
 // Use your own Sublogger.

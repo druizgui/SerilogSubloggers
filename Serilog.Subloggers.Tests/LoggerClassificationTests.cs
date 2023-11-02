@@ -16,6 +16,7 @@ namespace Serilog.Subloggers.Tests
             log.Security().Information("Security message");
             log.Business().Information("Business message");
             log.Analytics().Information("Analytics message");
+            log.Errors().Error("Errors message");
             using (log.TimeMetrics<LoggerClassificationTests>()) { }
             using (log.TimeMetrics<Serilog.ILogger>("TestName")) { }
             using (log.TimeMetrics("SingleTestName")) { }

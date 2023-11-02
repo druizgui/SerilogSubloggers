@@ -1,14 +1,8 @@
 # Serilog.Subloggers
- 
-## Description
+
 This library provides Serilog filters for separate logs in diferent purposes. 
 
-## Release notes
-
-### version 
-    Latest versión: 1.0.0
-
-### Install
+# Install
 
 > Install-Package Serilog.Subloggers
 
@@ -23,8 +17,70 @@ or
     > dotnet add package Serilog.Sinks.File
     > dotnet add package Serilog.Sinks.RollingFile
 
+# Package
+Latest versión: 1.2.0
+Framework: netstandard2.1
 
-## Serilog Subloggers
+Dependencies:
+    - Microsoft.Extensions.Logging.Abstractions
+    - Serilog
+
+# Versions 
+    
+## Version 1.2.0
+- New Error Sublogger
+- Create your Subloggers
+
+## Version 1.1.0
+
+- Tests coverage
+- LogClassificationExtensions Write methods
+- TimeMetrics Log use now \t separators for easy use in a table to check time metrics
+
+**New Time Extensions:**
+Allow register time from external time measure:
+
+- log.Time(ILogger Log, string name).Info(TimeSpan.FromSeconds(1));
+- log.Time<T>(ILogger Log).Info(TimeSpan.FromSeconds(2));
+- log.Time<T>(ILogger Log, string name).Info(TimeSpan.FromSeconds(3));
+
+- log.Time(ILogger Log, string name).Info(TimeSpan.FromSeconds(1));
+- log.Time<T>(ILogger Log).Info(TimeSpan.FromSeconds(2));
+- log.Time<T>(ILogger Log, string name).Info(TimeSpan.FromSeconds(3));
+
+## Version 1.0.0
+
+EventTypeEnricher for Serilog
+
+LoggerExtensions for **Microsoft.Extensions.Logging.ILogger**:
+
+- Info
+- Information
+- Warning
+- Error
+- Fatal
+- Write(LogLevel)
+- Debug
+- Verbose
+
+**LogClassificationExtensions**:
+
+- Info
+- Information
+- Warning
+- Error
+- Fatal
+- Write(LogLevel)
+- Debug
+- Verbose
+
+**LoggerClassificationExtensions**: 
+- System
+- Security
+- Analytics
+- Business
+
+# Serilog Subloggers
 
 Serilog allow you to send the log information to diferent places using filter techniques. 
 This library provides components to perform this more oriented to separate log responsabilities.
@@ -34,6 +90,7 @@ The following Log purposes are defined:
 - **Security**: For security purposes logs.
 - **Business**: for business information logs.
 - **Analytics**: for log analytics information. 
+- **Errors**: for log Errors. 
 - **TimeMetrics**: for measure time inside a component alnd log elapsed execution time.
 
 For use this feature you need configure 2 thinks: an event enricher to capture eventids in logs and 
@@ -44,39 +101,60 @@ a collection of different filters for filter by functionality or business domain
 This line capture eventId from log in order to configure a filter
 
 ```cs
-    .Enrich.With<EventTypeEnricher>()
+    .Enrich.With<SubloggerEnricher>()
 ```
 
-- Configure sub-loggers:
+- Configure subloggers:
 
 ```cs
-  .WriteTo.Logger(
-        lc => lc.Filter.With<TimeMetricsEventFilter>()
-        .WriteTo.File(@"log\TimeMetrics.txt", rollingInterval: RollingInterval.Day)
-        ) //Time metrics log to trace Elapsed time inside the software components
-                
-    .WriteTo.Logger(
-        lc => lc.Filter.With<AnalyticsEventFilter>()
-        .WriteTo.File(@"log\Analytics.txt", rollingInterval: RollingInterval.Day)
-        ) //
+// Log dedicated to security matters (user login successful, failed, ...)
+.WriteTo.Logger(
+    lc => lc.Filter.With<SecurityEventFilter>()
+    .WriteTo.File(@"log\Security.txt", rollingInterval: RollingInterval.Day)
+) 
 
-    .WriteTo.Logger(
-        lc => lc.Filter.With<BusinessEventFilter>()
-        .WriteTo.File(@"log\Business.txt", rollingInterval: RollingInterval.Day)
-    ) // Log dedicated to business information (a sucessful sell, an offer received, ...
+// Log dedicated to system information (a sucessful sell, an offer received, ...)
+.WriteTo.Logger(
+    lc => lc.Filter.With<SystemEventFilter>()
+    .WriteTo.File(@"log\System.txt", rollingInterval: RollingInterval.Day)
+)  
 
-    .WriteTo.Logger(
-        lc => lc.Filter.With<SystemEventFilter>()
-        .WriteTo.File(@"log\System.txt", rollingInterval: RollingInterval.Day))
-        // Log dedicated to business information (a sucessful sell, an offer received, ...)
+// Log for analytics information
+.WriteTo.Logger(
+    lc => lc.Filter.With<AnalyticsEventFilter>()
+    .WriteTo.File(@"log\Analytics.txt", rollingInterval: RollingInterval.Day)
+) 
 
+// Log dedicated to business information (a sucessful sell, an offer received, ...
+.WriteTo.Logger(
+    lc => lc.Filter.With<BusinessEventFilter>()
+    .WriteTo.File(@"log\Business.txt", rollingInterval: RollingInterval.Day)
+) 
+
+// Time metrics log to trace Elapsed time inside the software components
+.WriteTo.Logger(
+    lc => lc.Filter.With<TimeMetricsEventFilter>()
+    .WriteTo.File(@"log\TimeMetrics.txt", rollingInterval: RollingInterval.Day)
+) 
+
+// Log errors in a separate file:
     .WriteTo.Logger(
-        lc => lc.Filter.With<SecurityEventFilter>()
-        .WriteTo.File(@"log\Security.txt", rollingInterval: RollingInterval.Day))
-    // Log dedicated to security matters (user login successful, failed, ...)
+    lc => lc.Filter.With<ErrorsEventFilter>()
+    .WriteTo.File(@"log\Errors.txt", rollingInterval: RollingInterval.Day)
+) 
+
+// Use your own Sublogger.
+// - Create SubloggerExtensions method and key
+// - Create your EventFilter 
+// Configure in Serilog:
+    .WriteTo.Logger(
+    lc => lc.Filter.With<MyCustomEventFilter>()
+    .WriteTo.File(@"log\custom.txt", rollingInterval: RollingInterval.Day)
+) // Time metrics log to trace Elapsed time inside the software components
+;
 ```
 
-## Usage
+# Usage
 
 After configure Serilog, you can use the Serilog.Subloggers extensions in order to create diferent log events:
 Use this line to trace security events: 
@@ -100,35 +178,42 @@ or you can use to fluent API syntax:
 This snippet send an information event to the security log file, another one to System log and, finally te 'logon' event to analytics log.
 Notice that each log can be trace with the same log levels that any ILogger log. 
 
-### Security
+## Security
 Use this line to trace security events: 
 
 ```cs
     msLogger.Security().Info("Security message");
 ```
  
-### System
+## System
 Use this line to trace System events: 
 
 ```cs
     msLogger.System().Information("System message");
 ```
 
-### Analytics
+## Analytics
 Use this line to trace analytics events: 
 
 ```cs
     msLogger.Analytics().Information("Analytics message");
 ```
 
-### Business
+## Business
 Use this line to trace business events: 
 
 ```cs
     msLogger.Business().Info("Business message");
 ```
 
-### TimeMetrics
+## Errors
+Use this line to trace Errors: 
+
+```cs
+    msLogger.Errors().Error("Error message");
+```
+
+## TimeMetrics
 TimeMetrics is different to other log context. 
 Wraps the code in a using statement to measure the execution time of your code.
 
@@ -175,7 +260,6 @@ The result is:
 > 2023-09-04 20:12:25.291 +02:00 [INF] **Serilog.Subloggers.Sample.Program.Main**. Elapsed: 00:00:01.000
 
 
-
 ## Example
 
 Full code example:
@@ -187,30 +271,49 @@ static void Main(string[] args)
         .MinimumLevel.Debug()
         .WriteTo.Console() // default log in console for general purposes. All 
         .Enrich.With<EventTypeEnricher>() // used for read eventId log properties
+        // Log dedicated to security matters (user login successful, failed, ...)
         .WriteTo.Logger(
             lc => lc.Filter.With<SecurityEventFilter>()
             .WriteTo.File(@"log\Security.txt", rollingInterval: RollingInterval.Day)
-        ) // Log dedicated to security matters (user login successful, failed, ...)
+        ) 
 
+        // Log dedicated to system information (a sucessful sell, an offer received, ...)
         .WriteTo.Logger(
             lc => lc.Filter.With<SystemEventFilter>()
             .WriteTo.File(@"log\System.txt", rollingInterval: RollingInterval.Day)
-        )  // Log dedicated to business information (a sucessful sell, an offer received, ...)
+        )  
 
+        // Log for analytics information
         .WriteTo.Logger(
             lc => lc.Filter.With<AnalyticsEventFilter>()
             .WriteTo.File(@"log\Analytics.txt", rollingInterval: RollingInterval.Day)
-        ) // Log for analytics information
+        ) 
 
-
+        // Log dedicated to business information (a sucessful sell, an offer received, ...
         .WriteTo.Logger(
             lc => lc.Filter.With<BusinessEventFilter>()
             .WriteTo.File(@"log\Business.txt", rollingInterval: RollingInterval.Day)
-        ) // Log dedicated to business information (a sucessful sell, an offer received, ...
+        ) 
 
+        // Time metrics log to trace Elapsed time inside the software components
         .WriteTo.Logger(
             lc => lc.Filter.With<TimeMetricsEventFilter>()
             .WriteTo.File(@"log\TimeMetrics.txt", rollingInterval: RollingInterval.Day)
+        ) 
+
+        // Log errors in a separate file:
+            .WriteTo.Logger(
+            lc => lc.Filter.With<ErrorsEventFilter>()
+            .WriteTo.File(@"log\Errors.txt", rollingInterval: RollingInterval.Day)
+        ) 
+
+        // Use your own Sublogger.
+        // - Create SubloggerExtensions method and key
+        // - Create your EventFilter 
+        // Configure in Serilog:
+            .WriteTo.Logger(
+            lc => lc.Filter.With<MyCustomEventFilter>()
+            .WriteTo.File(@"log\custom.txt", rollingInterval: RollingInterval.Day)
         ) // Time metrics log to trace Elapsed time inside the software components
         ;
 
@@ -219,7 +322,7 @@ static void Main(string[] args)
     var totalTime_watch = new Stopwatch();
     totalTime_watch.Start();
 
-    using (var serilog = new SerilogLoggerFactory(Serilog.Log.Logger))
+    using (var serilog = new Serilog.Extensions.Logging.SerilogLoggerFactory(Serilog.Log.Logger))
     {
         Microsoft.Extensions.Logging.ILogger msLogger = serilog.CreateLogger("global");
 
@@ -248,6 +351,14 @@ static void Main(string[] args)
                 .Analytics()
                     .Information("Logon");
 
+            msLogger
+                .Errors()
+                    .Error("This is an error");
+
+            // Use your custom Sublogger:
+            msLogger
+                .MyCustom()
+                    .Info("This is my custom log info");
         }
 
         //Version 1.1.0
@@ -263,7 +374,6 @@ static void Main(string[] args)
     Serilog.Log.CloseAndFlush();
 }
 ```
-
 
 The output results for this example is:
 
@@ -313,6 +423,11 @@ System.Exception: security exception
 2023-09-04 20:12:24.230 +02:00 [INF] Business message
 ```
 
+**Log\Errors.txt**
+```
+2023-09-04 20:12:24.230 +02:00 [ERR] This is an error
+```
+
 **Log\TimeMetrics.txt**
 ```
 2023-09-04 20:12:25.291 +02:00 [INF] Serilog.Subloggers.Sample.Program.Main. Elapsed: 00:00:01.175
@@ -323,61 +438,42 @@ System.Exception: security exception
 
 You can see the full example in **Serilog.Subloggers.Sample** project.
 
+# Create your custom Subloggers
 
-## Framework
-- netstandard2.1
+Implement a Extension class with The Method to use as Sublogger. Use LogClassification.CustomSubloggerFactory to create sublogger log;
 
-## Net Core Dependencies
-- Microsoft.Extensions.Logging.Abstractions
+```cs
+public static class SubloggerExtensions
+{
+    public const string MyCustomKey = "Custom";
 
+    public static LogClassification MyCustom(this Microsoft.Extensions.Logging.ILogger log) => LogClassification.CustomSubloggerFactory(log, MyCustomKey);
+}
+```
 
-# Versions 
+Create a string Key property (MyCustomKey) or name that are used by the extension method and the custom event filter.
 
-## Version 1.0.0
+- Implement a Event filter class that inherits from **EventFilterBase**:
+```cs
+public class MyCustomEventFilter : EventFilterBase
+{
+    public override string FilterName => SubloggerExtensions.MyCustomKey;
+}
+```
 
-EventTypeEnricher for Serilog
+Configure in Serilog:
+```cs
+.WriteTo.Logger(
+    lc => lc.Filter.With<MyCustomEventFilter>()
+    .WriteTo.File(@"log\custom.txt", rollingInterval: RollingInterval.Day)
+)
+```
 
-LoggerExtensions for **Microsoft.Extensions.Logging.ILogger**:
+Use it in your code:
+```cs
+msLogger
+    .MyCustom()
+        .Info("This is my custom log info");
+```
 
-- Info
-- Information
-- Warning
-- Error
-- Fatal
-- Write(LogLevel)
-- Debug
-- Verbose
-
-**LogClassificationExtensions**:
-
-- Info
-- Information
-- Warning
-- Error
-- Fatal
-- Write(LogLevel)
-- Debug
-- Verbose
-
-**LoggerClassificationExtensions**: 
-- System
-- Security
-- Analytics
-- Business
-
-## Version 1.1.0
-
-- Tests coverage
-- LogClassificationExtensions Write methods
-- TimeMetrics Log use now \t separators for easy use in a table to check time metrics
-
-**New Time Extensions:**
-Allow register time from external time measure:
-
-- log.Time(ILogger Log, string name).Info(TimeSpan.FromSeconds(1));
-- log.Time<T>(ILogger Log).Info(TimeSpan.FromSeconds(2));
-- log.Time<T>(ILogger Log, string name).Info(TimeSpan.FromSeconds(3));
-
-- log.Time(ILogger Log, string name).Info(TimeSpan.FromSeconds(1));
-- log.Time<T>(ILogger Log).Info(TimeSpan.FromSeconds(2));
-- log.Time<T>(ILogger Log, string name).Info(TimeSpan.FromSeconds(3));
+You can see the example in **Serilog.Subloggers.Sample** project.

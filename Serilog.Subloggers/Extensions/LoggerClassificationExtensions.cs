@@ -22,6 +22,11 @@
         /// <returns>An instance of Sublogger for use as Business log.</returns>
         public static LogClassification Business(this ILogger log) => LogClassification.Factory(log, EventFactory.BusinessFactory());
 
+        /// <summary> Use a Sublogger of type Erros </summary>
+        /// <param name="log">ILogger instance</param>
+        /// <returns>An instance of Sublogger for use as TimeMetrics log.</returns>
+        public static LogClassification Errors(this ILogger log) => LogClassification.Factory(log, EventFactory.ErrorsFactory());
+
         /// <summary> Use a Sublogger of type TimeMetrics </summary>
         /// <param name="log">ILogger instance</param>
         /// <returns>An instance of Sublogger for use as TimeMetrics log.</returns>

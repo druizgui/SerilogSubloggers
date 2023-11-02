@@ -32,6 +32,13 @@
         }
 
         [TestMethod]
+        public void Errors()
+        {
+            var filter = new ErrorsEventFilter();
+            Assert.AreEqual(ClassificationLogs.Errors, filter.FilterName);
+        }
+
+        [TestMethod]
         public void TimeMetrics()
         {
             var filter = new TimeMetricsEventFilter();

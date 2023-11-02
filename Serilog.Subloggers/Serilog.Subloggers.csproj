@@ -4,9 +4,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <PropertyGroup>
-    <PackageVersion>1.1.0</PackageVersion>
-    <AssemblyVersion>1.1.0.0</AssemblyVersion>
-    <FileVersion>1.1.0.0</FileVersion>
+     <PackageVersion>1.2.0</PackageVersion>
+    <AssemblyVersion>1.2.0.0</AssemblyVersion>
+        <FileVersion>1.2.0.0</FileVersion>
   </PropertyGroup>
   <PropertyGroup>
     <Title>Serilog Subloggers using Filters</Title>

@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
 using Serilog.Core;
 using Serilog.Events;
+using System;
 using System.Linq;
 
 namespace Serilog

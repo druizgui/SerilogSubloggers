@@ -50,12 +50,11 @@ namespace Serilog.Subloggers.Tests
         {
             var filter = new TestEventFilter();
             var propertyFactory = new LogEventPropertyFactory();
-            LogEventProperty eventId = propertyFactory.CreateProperty("EventId","Other", new StructureValue(new[] { propertyFactory.CreateProperty("Other", "other", "val") }));
+            LogEventProperty eventId = propertyFactory.CreateProperty("EventId", "Name", new StructureValue(new[] { propertyFactory.CreateProperty("Other", "Other", "val") }));
             var logEvent = new LogEvent(DateTime.Now, LogEventLevel.Information, null, MessageTemplate.Empty, new[] { eventId });
 
             Assert.IsFalse(filter.IsEnabled(logEvent));
         }
-
 
         [TestMethod]
         public void EventFilterBase_Enabled_False()
@@ -71,6 +70,4 @@ namespace Serilog.Subloggers.Tests
     {
         public override string FilterName => "Test";
     }
-
-
 }

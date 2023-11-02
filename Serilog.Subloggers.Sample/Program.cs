@@ -1,7 +1,6 @@
 using Microsoft.Extensions.Logging;
 
 using Serilog;
-using Serilog.Extensions.Logging;
 using System.Diagnostics;
 
 namespace Serilog.Subloggers.Sample
@@ -13,32 +12,52 @@ namespace Serilog.Subloggers.Sample
             var loggerBuilder = new LoggerConfiguration()
                 .MinimumLevel.Debug()
                 .WriteTo.Console() // default log in console for general purposes. All 
-                .Enrich.With<EventTypeEnricher>() // used for read eventId log properties
+                .Enrich.With<SubloggerEnricher>() // used for read eventId log properties
+
+                // Log dedicated to security matters (user login successful, failed, ...)
                 .WriteTo.Logger(
                     lc => lc.Filter.With<SecurityEventFilter>()
                     .WriteTo.File(@"log\Security.txt", rollingInterval: RollingInterval.Day)
-                ) // Log dedicated to security matters (user login successful, failed, ...)
+                ) 
 
+                // Log dedicated to system information (a sucessful sell, an offer received, ...)
                 .WriteTo.Logger(
                     lc => lc.Filter.With<SystemEventFilter>()
                     .WriteTo.File(@"log\System.txt", rollingInterval: RollingInterval.Day)
-                )  // Log dedicated to business information (a sucessful sell, an offer received, ...)
+                )  
 
+                // Log for analytics information
                 .WriteTo.Logger(
                     lc => lc.Filter.With<AnalyticsEventFilter>()
                     .WriteTo.File(@"log\Analytics.txt", rollingInterval: RollingInterval.Day)
-                ) // Log for analytics information
+                ) 
 
-
+                // Log dedicated to business information (a sucessful sell, an offer received, ...
                 .WriteTo.Logger(
                     lc => lc.Filter.With<BusinessEventFilter>()
                     .WriteTo.File(@"log\Business.txt", rollingInterval: RollingInterval.Day)
-                ) // Log dedicated to business information (a sucessful sell, an offer received, ...
+                ) 
 
+                // Time metrics log to trace Elapsed time inside the software components
                 .WriteTo.Logger(
                     lc => lc.Filter.With<TimeMetricsEventFilter>()
                     .WriteTo.File(@"log\TimeMetrics.txt", rollingInterval: RollingInterval.Day)
-                ) // Time metrics log to trace Elapsed time inside the software components
+                ) 
+
+                // Log errors in a separate file:
+                .WriteTo.Logger(
+                    lc => lc.Filter.With<ErrorsEventFilter>()
+                    .WriteTo.File(@"log\Errors.txt", rollingInterval: RollingInterval.Day)
+                ) 
+
+                // Use your own Sublogger.
+                // - Create SubloggerExtensions method and key
+                // - Create your EventFilter 
+                // Configure in Serilog:
+                .WriteTo.Logger(
+                    lc => lc.Filter.With<MyCustomEventFilter>()
+                    .WriteTo.File(@"log\custom.txt", rollingInterval: RollingInterval.Day)
+                )
                 ;
 
             Serilog.Log.Logger = loggerBuilder.CreateLogger();
@@ -46,7 +65,7 @@ namespace Serilog.Subloggers.Sample
             var totalTime_watch = new Stopwatch();
             totalTime_watch.Start();
 
-            using (var serilog = new SerilogLoggerFactory(Serilog.Log.Logger))
+            using (var serilog = new Serilog.Extensions.Logging.SerilogLoggerFactory(Serilog.Log.Logger))
             {
                 Microsoft.Extensions.Logging.ILogger msLogger = serilog.CreateLogger("global");
 
@@ -75,6 +94,14 @@ namespace Serilog.Subloggers.Sample
                         .Analytics()
                             .Information("Logon");
 
+                    msLogger
+                        .Errors()
+                            .Error("This is an error");
+
+                    // Use your custom Sublogger:
+                    msLogger
+                        .MyCustom()
+                            .Info("This is my custom log info");
                 }
 
                 //Version 1.1.0
@@ -84,7 +111,6 @@ namespace Serilog.Subloggers.Sample
                 msLogger.Time("TimeMetric-1").Information(totalTime_watch.Elapsed);
                 msLogger.Time<Program>().Information(totalTime_watch.Elapsed);
                 msLogger.Time<Program>("Version-1.1.0").Information(totalTime_watch.Elapsed);
-
             }
         }
     }

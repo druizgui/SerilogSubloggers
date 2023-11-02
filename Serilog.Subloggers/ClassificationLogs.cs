@@ -5,4 +5,5 @@ internal static class ClassificationLogs
     public const string Business = "Business";
     public const string Analytics = "Analytics";
     public const string TimeMetrics = "TimeMetrics";
+    public const string Errors = "Errors";
 }
